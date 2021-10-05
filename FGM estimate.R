@@ -3,7 +3,10 @@
 ####################################################################
 library(R2OpenBUGS)
 library(copula)
-
+library(triangle)
+library(xlsx)
+library(ggplot2)
+library(gridExtra)
 ####################################################################
 #Density of the copula function FGM.
 dfgm=function(u,v,phi){

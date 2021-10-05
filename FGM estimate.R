@@ -329,11 +329,11 @@ Graph=function(m,omega){
   size=c(10,seq(50,1000,50))
   for (i in 1:21) {
     if(omega==0.2){
-      A=read.xlsx(file = "Vs3Resultados02.xlsx",sheetIndex = i)
+      A=read.xlsx(file = "Resultados02.xlsx",sheetIndex = i)
     }else if(omega==0.5){
-      A=read.xlsx(file = "Vs3-1Resultados05.xlsx",sheetIndex = i)
+      A=read.xlsx(file = "Resultados05.xlsx",sheetIndex = i)
     }else if(omega==0.9){
-      A=read.xlsx(file = "Vs3Resultados09.xlsx",sheetIndex = i)
+      A=read.xlsx(file = "Resultados09.xlsx",sheetIndex = i)
     }
     for (j in 2:7) {
       MA=rbind(MA,c(size[i],A[m,j],namemethod[(j-1)]))

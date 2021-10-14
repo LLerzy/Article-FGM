@@ -181,7 +181,6 @@ results1=function(phi,n,nboot=200,confidence,a,b,c){
     cho=sample(1:n,n,replace = T) #resample of index
     rdatan=Datas[cho,] #selection of sample items
     #estimates
-    #philm=Bisection(-1,1,rdatan) #ELM
     philm=safeUroot(f=function(ph){mapply(function(ph){
       dflv1(ph,rdatan[,1],rdatan[,2])},ph)},c(-1,1))$root
     if(philm>=-1 & philm<=1){
@@ -284,7 +283,7 @@ results2=function(phi,n,nboot=200, N, confidence,a,b,c){
                            c(DesBT,Bias[4],lenghtIBT,covprobIBT),
                            c(DesBB,Bias[5],lenghtIBB,covprobIBB),
                            c(DesBU,Bias[6],lenghtIBU,covprobIBU)),nrow=7,ncol=6,
-                    dimnames = list(list("Min","Mean","MSE","Max","Bias","Length","Coverage"),
+                    dimnames = list(list("Min","Mean","SD","Max","Bias","Length","Coverage"),
                                     list("LM","Tau","Spe","Triangular","Beta","Unif")))
   return(Descritive)
 }
@@ -298,7 +297,7 @@ name=as.character(size)
 for (i in 1 : 21){
   example=NA
   example=results2(phi=0.2,n=size[i],nboot=1000, N=1000, confidence=0.95, a=3071.6, b=4607.4, c=0.2)
-  write.xlsx(x=example, file="Resultados02.xlsx",sheetName =name[i],col.names = TRUE,
+  write.xlsx(x=example, file="Results02.xlsx",sheetName =name[i],col.names = TRUE,
              row.names = TRUE,append = TRUE)
   print(i)
 }
@@ -306,7 +305,7 @@ for (i in 1 : 21){
 for (i in 18 : 21){
   example=NA
   example=results2(phi=0.5,n=size[i],nboot=1000, N=1000, confidence=0.95, a=11.7, b=32.5, c=0.5)
-  write.xlsx(x=example, file="Resultados05.xlsx",sheetName =name[i],col.names = TRUE,
+  write.xlsx(x=example, file="Results05.xlsx",sheetName =name[i],col.names = TRUE,
              row.names = TRUE,append = TRUE)
   print(i)
 }
@@ -314,7 +313,7 @@ for (i in 18 : 21){
 for (i in 1 : 21){
   example=NA
   example=results2(phi=0.9,n=size[i],nboot=1000, N=1000, confidence=0.95, a=18.6875, b=280.3125, c=0.9)
-  write.xlsx(x=example, file="Resultados09.xlsx",sheetName =name[i],col.names = TRUE,
+  write.xlsx(x=example, file="Results09.xlsx",sheetName =name[i],col.names = TRUE,
              row.names = TRUE,append = TRUE)
   print(i)
 }
@@ -326,17 +325,17 @@ for (i in 1 : 21){
 # Function to construct graphs
 
 Graph=function(m,omega){
-  nameGra=c("Min","Mean","MSE","Max","Bias","Length","Coverage")
+  nameGra=c("Min","Mean","SD","Max","Bias","Length","Coverage")
   MA=matrix(data = NA,nrow=0,ncol = 3,dimnames = list(list(),list("Size",nameGra[m],"Method")))
   namemethod=1:6
   size=c(10,seq(50,1000,50))
   for (i in 1:21) {
     if(omega==0.2){
-      A=read.xlsx(file = "Resultados02.xlsx",sheetIndex = i)
+      A=read.xlsx(file = "Results02.xlsx",sheetIndex = i)
     }else if(omega==0.5){
-      A=read.xlsx(file = "Resultados05.xlsx",sheetIndex = i)
+      A=read.xlsx(file = "Results05.xlsx",sheetIndex = i)
     }else if(omega==0.9){
-      A=read.xlsx(file = "Resultados09.xlsx",sheetIndex = i)
+      A=read.xlsx(file = "Results09.xlsx",sheetIndex = i)
     }
     for (j in 2:7) {
       MA=rbind(MA,c(size[i],A[m,j],namemethod[(j-1)]))
@@ -361,14 +360,22 @@ grid.arrange(Bias02, Bias05, Bias09, nrow = 2,ncol=2,layout_matrix = rbind(c(1, 
                                                                            c(3, 3)))
 
 # Plot for MSE
-MSE=Graph(3,omega=0.2)
+MSE=Graph(3,omega=0.2) #just to initialize.
+MSE[,2]=Graph(3,omega=0.2)$SD^2+Graph(5,omega=0.2)$Bias^2
+colnames(MSE)=list("Size","MSE","Method")
 Mse02=ggplot(MSE,aes(x=Size , y=MSE,color = Method))+geom_line()+labs(title="Dependence of 0.2")+
   scale_x_continuous(breaks=c(10,seq(100,1000,100)))+xlab("Sample size")
-MSE=Graph(3,omega=0.5)
+
+MSE=Graph(3,omega=0.5) #just to initialize.
+MSE[,2]=Graph(3,omega=0.5)$SD^2+Graph(5,omega=0.5)$Bias^2
+colnames(MSE)=list("Size","MSE","Method")
 Mse05=ggplot(MSE,aes(x=Size , y=MSE,color = Method))+geom_line()+labs(title="Dependence of 0.5")+
   scale_x_continuous(breaks=c(10,seq(100,1000,100)))+xlab("Sample size")
-MSE=Graph(3,omega=0.5)
-Mse09=ggplot(MSE,aes(x=Size , y=MSE,color = Method))+geom_line()+labs(title="Dependence of 0.5")+
+
+MSE=Graph(3,omega=0.9) #just to initialize.
+MSE[,2]=Graph(3,omega=0.9)$SD^2+Graph(5,omega=0.9)$Bias^2
+colnames(MSE)=list("Size","MSE","Method")
+Mse09=ggplot(MSE,aes(x=Size , y=MSE,color = Method))+geom_line()+labs(title="Dependence of 0.9")+
   scale_x_continuous(breaks=c(10,seq(50,1000,50)))+xlab("Sample size")
 grid.arrange(Mse02, Mse05, Mse09, nrow = 2,ncol=2,layout_matrix = rbind(c(1, 2),
                                                                         c(3, 3)))
